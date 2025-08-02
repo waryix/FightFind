@@ -212,11 +212,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
         name: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
       });
 
-      // You'll need to set STRIPE_PRICE_ID in your environment variables
+      if (!process.env.STRIPE_PRICE_ID) {
+        throw new Error('STRIPE_PRICE_ID environment variable is required');
+      }
+
       const subscription = await stripe.subscriptions.create({
         customer: customer.id,
         items: [{
-          price: process.env.STRIPE_PRICE_ID || 'price_1234567890', // Replace with actual price ID
+          price: process.env.STRIPE_PRICE_ID,
         }],
         payment_behavior: 'default_incomplete',
         expand: ['latest_invoice.payment_intent'],
