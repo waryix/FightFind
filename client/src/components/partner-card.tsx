@@ -23,10 +23,11 @@ interface PartnerCardProps {
     isPro?: boolean;
   };
   onConnect: () => void;
+  onMessage?: () => void;
   disabled?: boolean;
 }
 
-export function PartnerCard({ partner, onConnect, disabled }: PartnerCardProps) {
+export function PartnerCard({ partner, onConnect, onMessage, disabled }: PartnerCardProps) {
   const getExperienceColor = (level: string) => {
     switch (level) {
       case "beginner":
@@ -154,6 +155,8 @@ export function PartnerCard({ partner, onConnect, disabled }: PartnerCardProps) 
             variant="outline" 
             size="icon"
             className="border-gray-300 hover:bg-gray-50"
+            onClick={onMessage}
+            disabled={!onMessage}
           >
             <MessageSquare className="w-4 h-4" />
           </Button>

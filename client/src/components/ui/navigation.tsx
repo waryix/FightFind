@@ -25,6 +25,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
     { href: "/", label: "Home" },
     { href: "/partners", label: "Find Partners" },
     { href: "/gyms", label: "Gyms" },
+    { href: "/messages", label: "Messages" },
   ] : [
     { href: "#features", label: "Features" },
     { href: "#safety", label: "Safety" },

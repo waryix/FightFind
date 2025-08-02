@@ -92,6 +92,21 @@ export default function Partners() {
     });
   };
 
+  const handleMessage = (partnerId: string) => {
+    // Create a connection for messaging and redirect to messages page
+    connectMutation.mutate({
+      receiverId: partnerId,
+      message: "Hi! I'd like to start a conversation with you.",
+    }, {
+      onSuccess: () => {
+        // Redirect to messages page after connection is created
+        setTimeout(() => {
+          window.location.href = "/messages";
+        }, 1000);
+      }
+    });
+  };
+
   const handleSearch = (filters: any) => {
     setSearchFilters(filters);
   };
@@ -158,6 +173,7 @@ export default function Partners() {
                       isPro: partner.experienceLevel === "professional",
                     }}
                     onConnect={() => handleConnect(partner.user.id)}
+                    onMessage={() => handleMessage(partner.user.id)}
                     disabled={connectMutation.isPending}
                   />
                 ))}

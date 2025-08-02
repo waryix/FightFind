@@ -10,6 +10,7 @@ import Profile from "@/pages/profile";
 import Partners from "@/pages/partners";
 import Gyms from "@/pages/gyms";
 import Subscribe from "@/pages/subscribe";
+import Messages from "@/pages/messages";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -25,6 +26,7 @@ function Router() {
           <Route path="/profile" component={Profile} />
           <Route path="/partners" component={Partners} />
           <Route path="/gyms" component={Gyms} />
+          <Route path="/messages" component={Messages} />
           <Route path="/subscribe" component={Subscribe} />
         </>
       )}
