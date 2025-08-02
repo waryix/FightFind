@@ -1,0 +1,102 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(240, 10%, 3.9%);
+  --muted: hsl(210, 40%, 98%);
+  --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(240, 10%, 3.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(240, 10%, 3.9%);
+  --border: hsl(214.3, 31.8%, 91.4%);
+  --input: hsl(214.3, 31.8%, 91.4%);
+  --primary: hsl(0, 84.2%, 60.2%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(210, 40%, 98%);
+  --secondary-foreground: hsl(222.2, 84%, 4.9%);
+  --accent: hsl(210, 40%, 98%);
+  --accent-foreground: hsl(222.2, 84%, 4.9%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 84.2%, 60.2%);
+  --radius: 0.5rem;
+  
+  /* Custom FightFinder colors */
+  --fight-red: hsl(0, 84.2%, 60.2%);
+  --fight-red-dark: hsl(0, 84.2%, 50.2%);
+  --fight-black: hsl(220, 13%, 9%);
+  --fight-gray: hsl(215, 28%, 17%);
+}
+
+.dark {
+  --background: hsl(220, 13%, 9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(215, 28%, 17%);
+  --muted-foreground: hsl(215, 20.2%, 65.1%);
+  --popover: hsl(220, 13%, 9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(220, 13%, 9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(215, 28%, 17%);
+  --input: hsl(215, 28%, 17%);
+  --primary: hsl(0, 84.2%, 60.2%);
+  --primary-foreground: hsl(0, 0%, 98%);
+  --secondary: hsl(215, 28%, 17%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(215, 28%, 17%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(0, 84.2%, 60.2%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  .text-fight-red {
+    color: var(--fight-red);
+  }
+  
+  .text-fight-black {
+    color: var(--fight-black);
+  }
+  
+  .bg-fight-red {
+    background-color: var(--fight-red);
+  }
+  
+  .bg-fight-red-dark {
+    background-color: var(--fight-red-dark);
+  }
+  
+  .bg-fight-black {
+    background-color: var(--fight-black);
+  }
+  
+  .bg-fight-gray {
+    background-color: var(--fight-gray);
+  }
+  
+  .border-fight-red {
+    border-color: var(--fight-red);
+  }
+  
+  .hover\:bg-fight-red-dark:hover {
+    background-color: var(--fight-red-dark);
+  }
+  
+  .hover\:text-fight-red:hover {
+    color: var(--fight-red);
+  }
+}
