@@ -30,6 +30,21 @@ export default function Gyms() {
 
   const { data: gyms, isLoading: gymsLoading, error: gymsError } = useQuery({
     queryKey: ["/api/gyms"],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:5000/api/gyms', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch gyms');
+      }
+      
+      return response.json();
+    },
     enabled: !!user,
   });
 
@@ -47,7 +62,20 @@ export default function Gyms() {
   }, [gymsError, toast]);
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
   };
 
   if (isLoading || !isAuthenticated) {

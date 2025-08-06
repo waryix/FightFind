@@ -54,18 +54,33 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
               {navigationItems.map((item) => (
-                <Link key={item.href} href={item.href}>
-                  <Button
-                    variant="ghost"
-                    className={`px-3 py-2 font-medium ${
-                      isActive(item.href)
-                        ? "text-fight-red"
-                        : "text-gray-700 hover:text-fight-red"
-                    }`}
-                  >
-                    {item.label}
-                  </Button>
-                </Link>
+                item.href.startsWith('#') ? (
+                  <a key={item.href} href={item.href}>
+                    <Button
+                      variant="ghost"
+                      className={`px-3 py-2 font-medium ${
+                        isActive(item.href)
+                          ? "text-fight-red"
+                          : "text-gray-700 hover:text-fight-red"
+                      }`}
+                    >
+                      {item.label}
+                    </Button>
+                  </a>
+                ) : (
+                  <Link key={item.href} href={item.href}>
+                    <Button
+                      variant="ghost"
+                      className={`px-3 py-2 font-medium ${
+                        isActive(item.href)
+                          ? "text-fight-red"
+                          : "text-gray-700 hover:text-fight-red"
+                      }`}
+                    >
+                      {item.label}
+                    </Button>
+                  </Link>
+                )
               ))}
               
               {user ? (
@@ -88,7 +103,7 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
                             alt={`${user.firstName} ${user.lastName}`} 
                           />
                           <AvatarFallback>
-                            {user.firstName?.[0]}{user.lastName?.[0]}
+                            {user?.firstName?.[0] || 'U'}{user?.lastName?.[0] || ''}
                           </AvatarFallback>
                         </Avatar>
                       </Button>
@@ -128,19 +143,35 @@ export function Navigation({ user, onLogin, onLogout }: NavigationProps) {
               <SheetContent side="right" className="w-[300px] sm:w-[400px]">
                 <div className="flex flex-col space-y-4 mt-8">
                   {navigationItems.map((item) => (
-                    <Link key={item.href} href={item.href}>
-                      <Button
-                        variant="ghost"
-                        className={`w-full justify-start ${
-                          isActive(item.href)
-                            ? "text-fight-red"
-                            : "text-gray-700 hover:text-fight-red"
-                        }`}
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        {item.label}
-                      </Button>
-                    </Link>
+                    item.href.startsWith('#') ? (
+                      <a key={item.href} href={item.href}>
+                        <Button
+                          variant="ghost"
+                          className={`w-full justify-start ${
+                            isActive(item.href)
+                              ? "text-fight-red"
+                              : "text-gray-700 hover:text-fight-red"
+                          }`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Button>
+                      </a>
+                    ) : (
+                      <Link key={item.href} href={item.href}>
+                        <Button
+                          variant="ghost"
+                          className={`w-full justify-start ${
+                            isActive(item.href)
+                              ? "text-fight-red"
+                              : "text-gray-700 hover:text-fight-red"
+                          }`}
+                          onClick={() => setIsMobileMenuOpen(false)}
+                        >
+                          {item.label}
+                        </Button>
+                      </Link>
+                    )
                   ))}
                   
                   {user ? (

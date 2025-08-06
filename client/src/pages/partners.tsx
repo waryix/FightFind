@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { apiRequest, queryClient } from "@/lib/queryClient";
+import { queryClient } from "@/lib/queryClient";
 import { isUnauthorizedError } from "@/lib/authUtils";
 import { Navigation } from "@/components/ui/navigation";
 import { Button } from "@/components/ui/button";
@@ -33,13 +33,44 @@ export default function Partners() {
 
   const { data: partners, isLoading: partnersLoading, error: partnersError } = useQuery({
     queryKey: ["/api/partners", searchFilters],
+    queryFn: async () => {
+      console.log('🔍 [Partners] Fetching partners from backend...');
+      const response = await fetch('http://localhost:5000/api/partners', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch partners');
+      }
+      const data = await response.json();
+      console.log('✅ [Partners] Received', data.length, 'partners from backend');
+      return data;
+    },
     enabled: !!user,
   });
 
   const connectMutation = useMutation({
     mutationFn: async (data: { receiverId: string; message?: string }) => {
-      const response = await apiRequest("POST", "/api/connections", data);
-      return response.json();
+      console.log('🔍 [Partners] Sending connection request:', data);
+      const response = await fetch('http://localhost:5000/api/connections', {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to send connection request');
+      }
+      const result = await response.json();
+      console.log('✅ [Partners] Connection request sent successfully');
+      return result;
     },
     onSuccess: () => {
       toast({
@@ -82,7 +113,20 @@ export default function Partners() {
   }, [partnersError, toast]);
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
   };
 
   const handleConnect = (partnerId: string) => {
@@ -157,26 +201,39 @@ export default function Partners() {
                 Found {partners.length} sparring partner{partners.length !== 1 ? 's' : ''}
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {partners.map((partner: any) => (
-                  <PartnerCard 
-                    key={partner.id} 
-                    partner={{
-                      id: partner.id,
-                      user: partner.user,
-                      discipline: partner.discipline,
-                      experienceLevel: partner.experienceLevel,
-                      location: partner.location,
-                      weightClass: partner.weightClass,
-                      bio: partner.bio,
-                      rating: partner.rating || "0.0",
-                      isOnline: Math.random() > 0.5, // Mock online status
-                      isPro: partner.experienceLevel === "professional",
-                    }}
-                    onConnect={() => handleConnect(partner.user.id)}
-                    onMessage={() => handleMessage(partner.user.id)}
-                    disabled={connectMutation.isPending}
-                  />
-                ))}
+                {partners.map((partner: any) => {
+                  // Add debugging and null checks
+                  console.log('🔍 [Partners] Rendering partner:', partner);
+                  
+                  // Ensure user object exists
+                  const user = partner.user || {
+                    id: partner.id,
+                    firstName: partner.firstName || 'Unknown',
+                    lastName: partner.lastName || 'User',
+                    profileImageUrl: null
+                  };
+                  
+                  return (
+                    <PartnerCard 
+                      key={partner.id} 
+                      partner={{
+                        id: partner.id,
+                        user: user,
+                        discipline: partner.discipline || 'Mixed Martial Arts',
+                        experienceLevel: partner.experienceLevel || 'Beginner',
+                        location: partner.location || 'Unknown Location',
+                        weightClass: partner.weightClass,
+                        bio: partner.bio,
+                        rating: partner.rating || "4.5",
+                        isOnline: partner.isOnline || Math.random() > 0.5,
+                        isPro: partner.isPro || partner.experienceLevel === "professional",
+                      }}
+                      onConnect={() => handleConnect(user.id)}
+                      onMessage={() => handleMessage(user.id)}
+                      disabled={connectMutation.isPending}
+                    />
+                  );
+                })}
               </div>
             </>
           ) : (

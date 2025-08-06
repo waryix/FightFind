@@ -11,6 +11,7 @@ import Partners from "@/pages/partners";
 import Gyms from "@/pages/gyms";
 import Subscribe from "@/pages/subscribe";
 import Messages from "@/pages/messages";
+import Auth from "@/pages/auth";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,15 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes - always accessible */}
+      <Route path="/auth" component={Auth} />
+      <Route path="/login" component={Auth} />
+      <Route path="/signup" component={Auth} />
+      <Route path="/pricing" component={Subscribe} />
+      <Route path="/features" component={Landing} />
+      <Route path="/safety" component={Landing} />
+      
+      {/* Conditional routes based on authentication */}
       {isLoading || !isAuthenticated ? (
         <Route path="/" component={Landing} />
       ) : (

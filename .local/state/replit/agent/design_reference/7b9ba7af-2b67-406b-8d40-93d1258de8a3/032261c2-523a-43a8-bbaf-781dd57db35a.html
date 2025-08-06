@@ -1,0 +1,649 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FightFinder - Find Your Perfect Sparring Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fight-red': '#DC2626',
+                        'fight-red-dark': '#991B1B',
+                        'fight-gray': '#1F2937',
+                        'fight-black': '#111827'
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body class="font-inter bg-gray-50">
+    <!-- Navigation Header -->
+    <nav class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-fight-red">FightFinder</h1>
+                    </div>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#" class="text-gray-700 hover:text-fight-red px-3 py-2 font-medium">Find Partners</a>
+                        <a href="#" class="text-gray-700 hover:text-fight-red px-3 py-2 font-medium">Gyms</a>
+                        <a href="#" class="text-gray-700 hover:text-fight-red px-3 py-2 font-medium">Safety</a>
+                        <a href="#" class="bg-fight-red text-white px-4 py-2 rounded-lg font-medium hover:bg-fight-red-dark transition-colors">Sign Up</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <button class="text-gray-700 hover:text-fight-red">
+                        <i class="fas fa-bars text-xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="relative bg-fight-black overflow-hidden">
+        <!-- Athletic training background with athletes sparring -->
+        <div class="absolute inset-0 bg-gradient-to-r from-fight-black via-fight-black/80 to-transparent z-10"></div>
+        <div class="absolute inset-0" style="background-image: url('https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080'); background-size: cover; background-position: center;"></div>
+        
+        <div class="relative z-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+            <div class="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
+                <div>
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight">
+                        Find Your Perfect
+                        <span class="text-fight-red">Sparring Partner</span>
+                    </h1>
+                    <p class="mt-6 text-xl text-gray-300 max-w-lg">
+                        Connect with fighters in your area. Train safely, improve together, and build lasting partnerships in boxing, MMA, and martial arts.
+                    </p>
+                    <div class="mt-8 flex flex-col sm:flex-row gap-4">
+                        <button class="bg-fight-red text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-fight-red-dark transition-colors transform hover:scale-105">
+                            Start Matching
+                        </button>
+                        <button class="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold text-lg hover:bg-white hover:text-fight-black transition-colors">
+                            Learn More
+                        </button>
+                    </div>
+                    <div class="mt-8 flex items-center space-x-6 text-gray-300">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-fight-red mr-2"></i>
+                            <span>10,000+ Active Fighters</span>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-shield-alt text-fight-red mr-2"></i>
+                            <span>Verified Profiles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search and Filter Section -->
+    <section class="bg-white py-12 border-b border-gray-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gray-50 rounded-xl p-6">
+                <h2 class="text-2xl font-bold text-fight-black mb-6">Find Sparring Partners Near You</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Discipline</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent">
+                            <option>Boxing</option>
+                            <option>MMA</option>
+                            <option>Muay Thai</option>
+                            <option>BJJ</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
+                        <select class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent">
+                            <option>Beginner</option>
+                            <option>Intermediate</option>
+                            <option>Advanced</option>
+                            <option>Professional</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" placeholder="City or ZIP code" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent">
+                    </div>
+                    <div class="flex items-end">
+                        <button class="w-full bg-fight-red text-white px-6 py-3 rounded-lg font-semibold hover:bg-fight-red-dark transition-colors">
+                            <i class="fas fa-search mr-2"></i>Search Partners
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partner Profiles Grid -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-fight-black">Available Sparring Partners</h2>
+                <p class="mt-4 text-xl text-gray-600">Connect with verified fighters in your area</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Profile Card 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <!-- Athletic boxer in training gear -->
+                    <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 relative" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600'); background-size: cover; background-position: center;">
+                        <div class="absolute top-4 right-4">
+                            <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Online</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-fight-black" data-bind="user.name">Marcus Rodriguez</h3>
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1 text-sm text-gray-600" data-bind="user.rating">4.9</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-boxing-glove text-fight-red mr-2"></i>
+                                <span data-bind="user.discipline">Boxing • Intermediate</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt text-fight-red mr-2"></i>
+                                <span data-bind="user.location">Los Angeles, CA • 2.3 miles</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-weight text-fight-red mr-2"></i>
+                                <span data-bind="user.weightClass">Welterweight (170 lbs)</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4" data-bind="user.bio">Looking for technical sparring partners. Focus on footwork and combinations. Available weekday evenings.</p>
+                        <div class="flex space-x-3">
+                            <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-fight-red-dark transition-colors" data-event="click:handleConnect">
+                                Connect
+                            </button>
+                            <button class="border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:handleMessage">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <!-- Female MMA fighter in training -->
+                    <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 relative" style="background-image: url('https://images.unsplash.com/photo-1594737626072-90dc274bc2bd?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600'); background-size: cover; background-position: center;">
+                        <div class="absolute top-4 right-4">
+                            <span class="bg-yellow-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Away</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-fight-black">Sarah Chen</h3>
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1 text-sm text-gray-600">4.8</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-fist-raised text-fight-red mr-2"></i>
+                                <span>MMA • Advanced</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt text-fight-red mr-2"></i>
+                                <span>Los Angeles, CA • 4.1 miles</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-weight text-fight-red mr-2"></i>
+                                <span>Flyweight (125 lbs)</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Former amateur competitor. Enjoy working on ground game and striking. Prefer morning sessions.</p>
+                        <div class="flex space-x-3">
+                            <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-fight-red-dark transition-colors">
+                                Connect
+                            </button>
+                            <button class="border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Profile Card 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow transform hover:scale-105">
+                    <!-- Professional boxer training in gym -->
+                    <div class="h-64 bg-gradient-to-br from-gray-200 to-gray-300 relative" style="background-image: url('https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600'); background-size: cover; background-position: center;">
+                        <div class="absolute top-4 right-4">
+                            <span class="bg-green-500 text-white px-2 py-1 rounded-full text-xs font-semibold">Online</span>
+                        </div>
+                        <div class="absolute top-4 left-4">
+                            <span class="bg-fight-red text-white px-2 py-1 rounded-full text-xs font-semibold">Pro</span>
+                        </div>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-xl font-bold text-fight-black">Jake Thompson</h3>
+                            <div class="flex items-center">
+                                <i class="fas fa-star text-yellow-400"></i>
+                                <span class="ml-1 text-sm text-gray-600">5.0</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2 mb-4">
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-boxing-glove text-fight-red mr-2"></i>
+                                <span>Boxing • Professional</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-map-marker-alt text-fight-red mr-2"></i>
+                                <span>Los Angeles, CA • 1.8 miles</span>
+                            </div>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-weight text-fight-red mr-2"></i>
+                                <span>Middleweight (160 lbs)</span>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-4">Professional boxer with 15+ years experience. Mentor-style sparring for intermediate to advanced partners.</p>
+                        <div class="flex space-x-3">
+                            <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-fight-red-dark transition-colors">
+                                Connect
+                            </button>
+                            <button class="border border-gray-300 text-gray-700 py-2 px-4 rounded-lg hover:bg-gray-50 transition-colors">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="text-center mt-12">
+                <button class="bg-fight-black text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors">
+                    Load More Partners
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gym Finder Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-fight-black">Find Training Locations</h2>
+                <p class="mt-4 text-xl text-gray-600">Discover gyms and training facilities near you</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <!-- Modern gym interior with boxing equipment -->
+                    <div class="rounded-xl overflow-hidden shadow-lg" style="background-image: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=800&h=600'); background-size: cover; background-position: center; height: 400px;"></div>
+                </div>
+                <div>
+                    <div class="space-y-6">
+                        <!-- Gym Card 1 -->
+                        <div class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-semibold text-fight-black">Elite Boxing Academy</h3>
+                                    <div class="flex items-center mt-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                            <span class="ml-1 text-sm text-gray-600">4.8 (127 reviews)</span>
+                                        </div>
+                                        <span class="mx-2 text-gray-300">•</span>
+                                        <span class="text-sm text-gray-600">1.2 miles away</span>
+                                    </div>
+                                    <p class="mt-3 text-gray-600">Full-service boxing gym with professional trainers and sparring programs.</p>
+                                </div>
+                                <button class="ml-4 bg-fight-red text-white px-4 py-2 rounded-lg font-medium hover:bg-fight-red-dark transition-colors">
+                                    Visit
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gym Card 2 -->
+                        <div class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-semibold text-fight-black">Iron MMA Gym</h3>
+                                    <div class="flex items-center mt-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                            <span class="ml-1 text-sm text-gray-600">4.9 (89 reviews)</span>
+                                        </div>
+                                        <span class="mx-2 text-gray-300">•</span>
+                                        <span class="text-sm text-gray-600">2.8 miles away</span>
+                                    </div>
+                                    <p class="mt-3 text-gray-600">Mixed martial arts training with ground game and striking programs.</p>
+                                </div>
+                                <button class="ml-4 bg-fight-red text-white px-4 py-2 rounded-lg font-medium hover:bg-fight-red-dark transition-colors">
+                                    Visit
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Gym Card 3 -->
+                        <div class="bg-gray-50 rounded-lg p-6 hover:shadow-md transition-shadow">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-semibold text-fight-black">Warriors Muay Thai</h3>
+                                    <div class="flex items-center mt-2">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-star text-yellow-400"></i>
+                                            <span class="ml-1 text-sm text-gray-600">4.7 (156 reviews)</span>
+                                        </div>
+                                        <span class="mx-2 text-gray-300">•</span>
+                                        <span class="text-sm text-gray-600">3.5 miles away</span>
+                                    </div>
+                                    <p class="mt-3 text-gray-600">Traditional Muay Thai training with authentic techniques and sparring.</p>
+                                </div>
+                                <button class="ml-4 bg-fight-red text-white px-4 py-2 rounded-lg font-medium hover:bg-fight-red-dark transition-colors">
+                                    Visit
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Premium Features Section -->
+    <section class="py-16 bg-fight-black">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white">Upgrade to Premium</h2>
+                <p class="mt-4 text-xl text-gray-300">Unlock advanced features for serious fighters</p>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Basic Plan -->
+                <div class="bg-white rounded-xl p-8 relative">
+                    <h3 class="text-2xl font-bold text-fight-black mb-4">Basic</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-fight-black">Free</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Basic profile creation</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Limited partner search</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">3 connections per week</span>
+                        </li>
+                    </ul>
+                    <button class="w-full border-2 border-fight-red text-fight-red py-3 rounded-lg font-semibold hover:bg-fight-red hover:text-white transition-colors">
+                        Current Plan
+                    </button>
+                </div>
+
+                <!-- Pro Plan -->
+                <div class="bg-fight-red rounded-xl p-8 relative transform scale-105">
+                    <div class="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <span class="bg-white text-fight-red px-4 py-1 rounded-full text-sm font-semibold">Most Popular</span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-white mb-4">Pro</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-white">$19</span>
+                        <span class="text-white/80">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span class="text-white">Unlimited connections</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span class="text-white">Advanced filtering</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span class="text-white">Priority matching</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-white mr-3"></i>
+                            <span class="text-white">Direct messaging</span>
+                        </li>
+                    </ul>
+                    <button class="w-full bg-white text-fight-red py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
+                        Start Pro Trial
+                    </button>
+                </div>
+
+                <!-- Elite Plan -->
+                <div class="bg-white rounded-xl p-8 relative">
+                    <h3 class="text-2xl font-bold text-fight-black mb-4">Elite</h3>
+                    <div class="mb-6">
+                        <span class="text-4xl font-bold text-fight-black">$39</span>
+                        <span class="text-gray-600">/month</span>
+                    </div>
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Everything in Pro</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Video call integration</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Training analytics</span>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-check text-green-500 mr-3"></i>
+                            <span class="text-gray-700">Professional coaching</span>
+                        </li>
+                    </ul>
+                    <button class="w-full border-2 border-fight-red text-fight-red py-3 rounded-lg font-semibold hover:bg-fight-red hover:text-white transition-colors">
+                        Choose Elite
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Safety Guidelines Section -->
+    <section class="py-16 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-fight-black">Safety First</h2>
+                <p class="mt-4 text-xl text-gray-600">Your safety is our top priority</p>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div class="text-center">
+                    <div class="bg-fight-red rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-shield-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-fight-black mb-2">Verified Profiles</h3>
+                    <p class="text-gray-600">All members undergo identity verification and background checks</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-fight-red rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-comments text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-fight-black mb-2">Safe Communication</h3>
+                    <p class="text-gray-600">In-app messaging keeps your personal information private</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-fight-red rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-fight-black mb-2">Public Venues</h3>
+                    <p class="text-gray-600">Meet at verified gyms and public training facilities</p>
+                </div>
+                <div class="text-center">
+                    <div class="bg-fight-red rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-exclamation-triangle text-white text-2xl"></i>
+                    </div>
+                    <h3 class="text-lg font-semibold text-fight-black mb-2">Report System</h3>
+                    <p class="text-gray-600">Easy reporting tools for inappropriate behavior</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-fight-black text-white py-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-2xl font-bold text-fight-red mb-4">FightFinder</h3>
+                    <p class="text-gray-300">Connecting fighters worldwide for safe, productive sparring sessions.</p>
+                    <div class="flex space-x-4 mt-4">
+                        <a href="#" class="text-gray-300 hover:text-fight-red">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-fight-red">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-300 hover:text-fight-red">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Platform</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Find Partners</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Browse Gyms</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Safety Guidelines</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Community</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Support</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Help Center</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Contact Us</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Report Issue</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Training Tips</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-300 hover:text-white">Terms of Service</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Privacy Policy</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Cookie Policy</a></li>
+                        <li><a href="#" class="text-gray-300 hover:text-white">Disclaimer</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-700 mt-8 pt-8 text-center">
+                <p class="text-gray-300">&copy; 2024 FightFinder. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Payment Modal (Hidden by default) -->
+    <div id="paymentModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl max-w-md w-full p-6">
+                <div class="text-center mb-6">
+                    <h3 class="text-2xl font-bold text-fight-black">Upgrade to Pro</h3>
+                    <p class="text-gray-600 mt-2">Start your 7-day free trial</p>
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold">Pro Monthly</span>
+                        <span class="text-xl font-bold">$19.00</span>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1">Billed monthly • Cancel anytime</p>
+                </div>
+
+                <form class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                        <input type="email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="your@email.com">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                        <div class="border border-gray-300 rounded-lg p-4">
+                            <!-- TODO: Implement Stripe payment elements -->
+                            <div class="text-center text-gray-500">
+                                <i class="fas fa-credit-card text-2xl mb-2"></i>
+                                <p>Secure payment processing</p>
+                                <small>Powered by Stripe</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-fight-red text-white py-3 rounded-lg font-semibold hover:bg-fight-red-dark transition-colors">
+                        Start Free Trial
+                    </button>
+                </form>
+
+                <p class="text-xs text-gray-500 text-center mt-4">
+                    By proceeding, you agree to our Terms of Service and Privacy Policy
+                </p>
+
+                <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600" onclick="document.getElementById('paymentModal').classList.add('hidden')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // TODO: Implement business logic, API calls, and state management
+            
+            // Modal functionality
+            const proButtons = document.querySelectorAll('button');
+            const paymentModal = document.getElementById('paymentModal');
+            
+            proButtons.forEach(button => {
+                if (button.textContent.includes('Start Pro Trial')) {
+                    button.addEventListener('click', function() {
+                        paymentModal.classList.remove('hidden');
+                    });
+                }
+            });
+
+            // Close modal when clicking outside
+            paymentModal.addEventListener('click', function(e) {
+                if (e.target === paymentModal) {
+                    paymentModal.classList.add('hidden');
+                }
+            });
+
+            // Simulate profile interactions
+            document.querySelectorAll('[data-event]').forEach(element => {
+                element.addEventListener('click', function() {
+                    const action = this.getAttribute('data-event');
+                    console.log('Action triggered:', action);
+                    // TODO: Implement actual functionality
+                });
+            });
+
+            // Search functionality placeholder
+            const searchButton = document.querySelector('button[class*="bg-fight-red"]:has(i.fa-search)');
+            if (searchButton) {
+                searchButton.addEventListener('click', function() {
+                    console.log('Search triggered');
+                    // TODO: Implement search API call
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

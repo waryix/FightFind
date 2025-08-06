@@ -18,10 +18,24 @@ import {
 import { db } from "./db";
 import { eq, and, or, sql, desc, asc } from "drizzle-orm";
 
+import jwt from 'jsonwebtoken';
+
 export interface IStorage {
-  // User operations (required for Replit Auth)
+  getUserByEmail(email: string): Promise<User | undefined>;
+  getUserById(id: string): Promise<User | undefined>;
+  // User operations (required for Auth)
   getUser(id: string): Promise<User | undefined>;
   upsertUser(user: UpsertUser): Promise<User>;
+  createUser(userData: { 
+    firstName: string; 
+    lastName: string; 
+    email: string; 
+    provider: string;
+    emailVerified: boolean;
+    googleId?: string;
+    profileImageUrl?: string;
+  }): Promise<User>;
+  createToken(user: User): string;
   updateUserStripeInfo(userId: string, stripeCustomerId: string, stripeSubscriptionId: string): Promise<User>;
   
   // Fighter profile operations
@@ -50,27 +64,166 @@ export interface IStorage {
   // Message operations
   getMessagesByConnection(connectionId: string): Promise<(Message & { sender: User })[]>;
   createMessage(message: InsertMessage): Promise<Message>;
+  getAllUsers(): Promise<User[]>;
 }
 
 export class DatabaseStorage implements IStorage {
+  async getUserByEmail(email: string): Promise<User | undefined> {
+    // First, let's log the query we're about to make
+    console.log('🔍 [Storage Debug] Checking database columns...');
+    
+    try {
+      // Start with just the essential columns
+      const [user] = await db
+        .select({
+          id: users.id,
+          email: users.email,
+        })
+        .from(users)
+        .where(eq(users.email, email));
+
+      console.log('✅ [Storage Debug] Basic query successful:', user);
+      return user as User;
+    } catch (error) {
+      console.error('❌ [Storage Debug] Query error:', error);
+      throw error;
+    }
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const [user] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        provider: users.provider,
+        googleId: users.googleId,
+        emailVerified: users.emailVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt
+      })
+      .from(users)
+      .where(eq(users.id, id));
+    return user as User;
+  }
+
   // User operations
   async getUser(id: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
+    const [user] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        provider: users.provider,
+        googleId: users.googleId,
+        emailVerified: users.emailVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt
+      })
+      .from(users)
+      .where(eq(users.id, id));
     return user;
+  }
+
+  async createUser(userData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    provider: string;
+    emailVerified: boolean;
+    googleId?: string;
+    profileImageUrl?: string;
+  }): Promise<User> {
+    console.log('🔍 [Storage] Creating new user:', {
+      email: userData.email.substring(0, 3) + '...',
+      provider: userData.provider
+    });
+
+    const [user] = await db
+      .insert(users)
+      .values({
+        id: crypto.randomUUID(),
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        profileImageUrl: userData.profileImageUrl,
+        provider: userData.provider,
+        googleId: userData.googleId,
+        emailVerified: userData.emailVerified,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      })
+      .returning({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        provider: users.provider,
+        googleId: users.googleId,
+        emailVerified: users.emailVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt
+      });
+    return user;
+  }
+
+  createToken(user: User): string {
+    return jwt.sign(
+      { 
+        id: user.id,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName
+      },
+      process.env.JWT_SECRET || 'default_jwt_secret',
+      { expiresIn: '7d' }
+    );
   }
 
   async upsertUser(userData: UpsertUser): Promise<User> {
     const [user] = await db
       .insert(users)
-      .values(userData)
+      .values({
+        id: userData.id,
+        email: userData.email,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        profileImageUrl: userData.profileImageUrl,
+        provider: userData.provider,
+        googleId: userData.googleId,
+        emailVerified: userData.emailVerified,
+        updatedAt: new Date()
+      })
       .onConflictDoUpdate({
         target: users.id,
         set: {
-          ...userData,
-          updatedAt: new Date(),
+          email: userData.email,
+          firstName: userData.firstName,
+          lastName: userData.lastName,
+          profileImageUrl: userData.profileImageUrl,
+          provider: userData.provider,
+          googleId: userData.googleId,
+          emailVerified: userData.emailVerified,
+          updatedAt: new Date()
         },
       })
-      .returning();
+      .returning({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        profileImageUrl: users.profileImageUrl,
+        provider: users.provider,
+        googleId: users.googleId,
+        emailVerified: users.emailVerified,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt
+      });
     return user;
   }
 
@@ -188,23 +341,24 @@ export class DatabaseStorage implements IStorage {
 
   async getConnectionsByUser(userId: string): Promise<(Connection & { requester: User; receiver: User })[]> {
     const results = await db
-      .select()
+      .select({
+        connection: connections,
+        requester: users,
+        receiver: users.as('receiver')
+      })
       .from(connections)
-      .innerJoin(users, or(
-        eq(connections.requesterId, users.id),
-        eq(connections.receiverId, users.id)
-      ))
+      .innerJoin(users, eq(connections.requesterId, users.id))
+      .innerJoin(users.as('receiver'), eq(connections.receiverId, users.as('receiver').id))
       .where(or(
         eq(connections.requesterId, userId),
         eq(connections.receiverId, userId)
       ))
       .orderBy(desc(connections.updatedAt));
 
-    // This is a simplified version - you'd want to properly join both requester and receiver
     return results.map(row => ({
-      ...row.connections,
-      requester: row.users,
-      receiver: row.users, // In production, you'd need separate joins
+      ...row.connection,
+      requester: row.requester,
+      receiver: row.receiver
     }));
   }
 
@@ -235,6 +389,10 @@ export class DatabaseStorage implements IStorage {
   async createMessage(message: InsertMessage): Promise<Message> {
     const [newMessage] = await db.insert(messages).values(message).returning();
     return newMessage;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
   }
 }
 

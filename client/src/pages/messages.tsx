@@ -1,6 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Send, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Navigation } from "@/components/ui/navigation";
+import { useEffect } from "react";
 import { isUnauthorizedError } from "@/lib/authUtils";
-import { useEffect as useAuthEffect } from "react";
 
 export default function Messages() {
   const { user, isAuthenticated, isLoading } = useAuth();
@@ -21,7 +21,7 @@ export default function Messages() {
   const [messageText, setMessageText] = useState("");
 
   // Redirect if not authenticated
-  useAuthEffect(() => {
+  useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       toast({
         title: "Unauthorized",
@@ -38,6 +38,24 @@ export default function Messages() {
   // Fetch connections
   const { data: connections = [], isLoading: connectionsLoading } = useQuery({
     queryKey: ["/api/connections"],
+    queryFn: async () => {
+      console.log('🔍 [Messages] Fetching connections...');
+      const response = await fetch('http://localhost:5000/api/connections', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch connections');
+      }
+      
+      const data = await response.json();
+      console.log('✅ [Messages] Connections fetched:', data);
+      return data;
+    },
     enabled: isAuthenticated,
     retry: false,
   });
@@ -53,7 +71,24 @@ export default function Messages() {
   const sendMessageMutation = useMutation({
     mutationFn: async (messageData: { content: string }) => {
       if (!selectedConnection) throw new Error("No connection selected");
-      return apiRequest("POST", `/api/connections/${selectedConnection}/messages`, messageData);
+      const response = await fetch(`http://localhost:5000/api/messages`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          connectionId: selectedConnection,
+          content: messageData.content
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+      
+      return response.json();
     },
     onSuccess: () => {
       setMessageText("");
@@ -98,9 +133,31 @@ export default function Messages() {
 
   const acceptedConnections = (connections as any[]).filter((conn: any) => conn.status === "accepted");
 
+  const handleLogout = () => {
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+      <Navigation 
+        user={user}
+        onLogin={() => window.location.href = '/auth'}
+        onLogout={handleLogout}
+      />
+      <div className="max-w-6xl mx-auto p-4">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-white mb-2">Messages</h1>
           <p className="text-slate-300">Chat with your sparring partners</p>

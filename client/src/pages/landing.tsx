@@ -6,6 +6,8 @@ import { SearchFilter } from "@/components/search-filter";
 import { PartnerCard } from "@/components/partner-card";
 import { GymCard } from "@/components/gym-card";
 import { Shield, Users, MessageSquare, MapPin, Star, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useLocation } from "wouter";
 
 const mockPartners = [
   {
@@ -87,13 +89,88 @@ const mockGyms = [
 ];
 
 export default function Landing() {
+  const [, setLocation] = useLocation();
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Check for existing authentication in localStorage
+    const storedAuth = localStorage.getItem('isAuthenticated');
+    const storedUser = localStorage.getItem('user');
+    
+    if (storedAuth === 'true' && storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        setIsAuthenticated(true);
+        setUser(userData);
+      } catch (error) {
+        console.error('Error parsing stored user data:', error);
+        localStorage.removeItem('user');
+        localStorage.removeItem('isAuthenticated');
+      }
+    }
+    
+    // Check for Google login success in URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const googleLogin = urlParams.get('google_login');
+    const loginSuccess = urlParams.get('login');
+    const provider = urlParams.get('provider');
+    const mockLogin = urlParams.get('mock');
+    
+    if (googleLogin === 'success' || (loginSuccess === 'success' && provider === 'google')) {
+      // Handle Google OAuth success
+      const googleUser = {
+        id: Date.now().toString(),
+        firstName: "Google",
+        lastName: "User",
+        email: "user@gmail.com",
+        provider: "google"
+      };
+      
+      setIsAuthenticated(true);
+      setUser(googleUser);
+      
+      // Store in localStorage
+      localStorage.setItem('user', JSON.stringify(googleUser));
+      localStorage.setItem('isAuthenticated', 'true');
+      
+      // Clean up URL parameters
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, []);
+
   const handleLogin = () => {
-    window.location.href = "/api/login";
+    window.location.href = "/auth";
+  };
+
+  const handleLogout = () => {
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Update local state immediately
+    setIsAuthenticated(false);
+    setUser(null);
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation onLogin={handleLogin} />
+      <Navigation 
+        onLogin={handleLogin} 
+        user={isAuthenticated ? user : null}
+        onLogout={handleLogout}
+      />
       
       {/* Hero Section */}
       <section className="relative bg-fight-black overflow-hidden">
@@ -155,8 +232,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Partner Profiles Section */}
-      <section className="py-16 bg-gray-50">
+      {/* Partner Profiles Section - Features */}
+      <section id="features" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-fight-black">Available Sparring Partners</h2>
@@ -183,7 +260,7 @@ export default function Landing() {
       </section>
 
       {/* Gym Finder Section */}
-      <section className="py-16 bg-white">
+      <section id="gyms" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-fight-black">Find Training Locations</h2>
@@ -210,8 +287,8 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Premium Features Section */}
-      <section className="py-16 bg-fight-black">
+      {/* Premium Features Section - Pricing */}
+      <section id="pricing" className="py-16 bg-fight-black">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-white">Upgrade to Premium</h2>
@@ -328,7 +405,7 @@ export default function Landing() {
       </section>
 
       {/* Safety Guidelines Section */}
-      <section className="py-16 bg-gray-50">
+      <section id="safety" className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-fight-black">Safety First</h2>

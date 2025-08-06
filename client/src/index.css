@@ -100,3 +100,45 @@
     color: var(--fight-red);
   }
 }
+
+@layer utilities {
+  .border-border {
+    border-color: var(--border);
+  }
+  .bg-background {
+    background-color: var(--background);
+  }
+  .text-foreground {
+    color: var(--foreground);
+  }
+  .bg-card {
+    background-color: var(--card);
+  }
+  .text-card-foreground {
+    color: var(--card-foreground);
+  }
+  .bg-primary {
+    background-color: var(--primary);
+  }
+  .text-primary-foreground {
+    color: var(--primary-foreground);
+  }
+  .bg-muted {
+    background-color: var(--muted);
+  }
+  .text-muted-foreground {
+    color: var(--muted-foreground);
+  }
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  .text-accent-foreground {
+    color: var(--accent-foreground);
+  }
+  .bg-destructive {
+    background-color: var(--destructive);
+  }
+  .text-destructive-foreground {
+    color: var(--destructive-foreground);
+  }
+}

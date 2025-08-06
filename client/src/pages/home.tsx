@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/ui/navigation";
 import { PartnerCard } from "@/components/partner-card";
 import { SearchFilter } from "@/components/search-filter";
@@ -30,8 +30,29 @@ export default function Home() {
     }
   }, [isAuthenticated, isLoading, toast]);
 
-  const { data: profile, isLoading: profileLoading } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ["/api/profile"],
+    queryFn: async () => {
+      console.log('🔍 [Home] Fetching profile for completeness check...');
+      const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+      
+      const response = await fetch('http://localhost:5000/api/profile', {
+        credentials: 'include',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (!response.ok) {
+        console.error('❌ [Home] Profile fetch failed');
+        return null;
+      }
+      
+      const data = await response.json();
+      console.log('✅ [Home] Profile fetched:', data);
+      return data;
+    },
     enabled: !!user,
   });
 
@@ -59,7 +80,20 @@ export default function Home() {
   }, [partnersError, toast]);
 
   const handleLogout = () => {
-    window.location.href = "/api/logout";
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
   };
 
   if (isLoading || !isAuthenticated) {
@@ -108,7 +142,7 @@ export default function Home() {
                   <div className="ml-4">
                     <p className="text-sm font-medium text-gray-600">Active Partners</p>
                     <p className="text-2xl font-bold text-fight-black">
-                      {connectionsLoading ? '...' : connections?.filter((c: any) => c.status === 'accepted').length || 0}
+                      {connectionsLoading ? '...' : (connections && Array.isArray(connections) ? (connections as any[]).filter((c: any) => c.status === 'accepted').length : 0)}
                     </p>
                   </div>
                 </div>
@@ -185,9 +219,9 @@ export default function Home() {
                 </Card>
               ))}
             </div>
-          ) : recentPartners?.length > 0 ? (
+          ) : recentPartners && Array.isArray(recentPartners) && recentPartners.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {recentPartners.slice(0, 3).map((partner: any) => (
+              {(recentPartners as any[]).slice(0, 3).map((partner: any) => (
                 <PartnerCard 
                   key={partner.id} 
                   partner={partner} 

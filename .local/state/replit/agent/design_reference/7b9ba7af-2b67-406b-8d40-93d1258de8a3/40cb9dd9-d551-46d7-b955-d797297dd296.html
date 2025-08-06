@@ -1,0 +1,904 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FightFinder - Find Your Sparring Partner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'fight-red': '#DC2626',
+                        'fight-dark': '#1F2937',
+                        'fight-gold': '#FBBF24',
+                    },
+                    fontFamily: {
+                        'inter': ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        };
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="font-inter bg-gray-50">
+
+<!-- @COMPONENT: Header -->
+<header class="bg-white shadow-lg border-b-2 border-fight-red">
+    <div class="container mx-auto px-4 py-4">
+        <nav class="flex items-center justify-between">
+            <div class="flex items-center space-x-2">
+                <div class="w-10 h-10 bg-fight-red rounded-lg flex items-center justify-center">
+                    <i class="fas fa-fist-raised text-white text-lg"></i>
+                </div>
+                <span class="text-2xl font-bold text-fight-dark">FightFinder</span>
+            </div>
+            
+            <div class="hidden md:flex items-center space-x-6">
+                <a href="#browse" class="text-gray-700 hover:text-fight-red font-medium transition-colors">Browse Partners</a>
+                <a href="#gyms" class="text-gray-700 hover:text-fight-red font-medium transition-colors">Find Gyms</a>
+                <a href="#safety" class="text-gray-700 hover:text-fight-red font-medium transition-colors">Safety</a>
+                <button class="bg-fight-red text-white px-6 py-2 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                    Sign Up
+                </button>
+            </div>
+            
+            <button class="md:hidden text-fight-dark">
+                <i class="fas fa-bars text-xl"></i>
+            </button>
+        </nav>
+    </div>
+</header>
+<!-- @END_COMPONENT: Header -->
+
+<!-- @COMPONENT: Hero Section -->
+<section class="relative bg-fight-dark text-white py-20 overflow-hidden">
+    <!-- Hero background with boxing training image -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute inset-0 bg-black bg-opacity-60"></div>
+        <img src="https://images.unsplash.com/photo-1549719386-74dfcbf7dbed?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1920&h=1080" alt="Boxing training session" class="w-full h-full object-cover">
+    </div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-5xl md:text-7xl font-black mb-6 leading-tight">
+                Find Your Perfect
+                <span class="text-fight-red">Sparring Partner</span>
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 text-gray-300 max-w-2xl mx-auto">
+                Connect with fighters in your area. Train safely, improve together, and build lasting partnerships in the combat sports community.
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
+                <button class="bg-fight-red text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-red-700 transition-all transform hover:scale-105 shadow-lg">
+                    <i class="fas fa-search mr-2"></i>
+                    Find Partners Now
+                </button>
+                <button class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-white hover:text-fight-dark transition-all">
+                    <i class="fas fa-user-plus mr-2"></i>
+                    Create Profile
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- @END_COMPONENT: Hero Section -->
+
+<!-- @COMPONENT: Features Section -->
+<section class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-fight-dark mb-4">Why Choose FightFinder?</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">The most trusted platform for connecting combat sports athletes</p>
+        </div>
+        
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="text-center p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-fight-red rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-map-marker-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-fight-dark mb-3">Location-Based Matching</h3>
+                <p class="text-gray-600">Find sparring partners near you with precise location matching and gym recommendations.</p>
+            </div>
+            
+            <div class="text-center p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-fight-red rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-shield-alt text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-fight-dark mb-3">Safety First</h3>
+                <p class="text-gray-600">Verified profiles, safety guidelines, and community standards ensure secure connections.</p>
+            </div>
+            
+            <div class="text-center p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
+                <div class="w-16 h-16 bg-fight-red rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-users text-white text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-fight-dark mb-3">Skill-Based Pairing</h3>
+                <p class="text-gray-600">Match with partners based on experience level, weight class, and training goals.</p>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- @END_COMPONENT: Features Section -->
+
+<!-- @COMPONENT: Browse Partners Section -->
+<section id="browse" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Filters Sidebar -->
+            <div class="lg:w-1/4">
+                <div class="bg-white rounded-xl p-6 shadow-md sticky top-6">
+                    <h3 class="text-xl font-bold text-fight-dark mb-6">Filters</h3>
+                    
+                    <!-- Discipline Filter -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Discipline</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" checked data-mock="true">
+                                <span class="ml-2 text-gray-700">Boxing</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-2 text-gray-700">MMA</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-2 text-gray-700">Kickboxing</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-2 text-gray-700">Muay Thai</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Level -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Experience Level</label>
+                        <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" data-mock="true">
+                            <option>Any Level</option>
+                            <option>Beginner (0-1 years)</option>
+                            <option>Intermediate (2-5 years)</option>
+                            <option>Advanced (5+ years)</option>
+                            <option>Professional</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Weight Class -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Weight Class</label>
+                        <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" data-mock="true">
+                            <option>Any Weight</option>
+                            <option>Flyweight (125 lb)</option>
+                            <option>Bantamweight (135 lb)</option>
+                            <option>Featherweight (145 lb)</option>
+                            <option>Lightweight (155 lb)</option>
+                            <option>Welterweight (170 lb)</option>
+                            <option>Middleweight (185 lb)</option>
+                            <option>Light Heavyweight (205 lb)</option>
+                            <option>Heavyweight (265 lb)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Distance -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Distance</label>
+                        <input type="range" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer" min="1" max="50" value="10" data-mock="true">
+                        <div class="flex justify-between text-sm text-gray-500 mt-1">
+                            <span>1 mile</span>
+                            <span data-bind="distance">10 miles</span>
+                            <span>50+ miles</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Partner Cards -->
+            <div class="lg:w-3/4">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold text-fight-dark">Available Partners</h2>
+                    <div class="flex items-center space-x-4">
+                        <select class="p-2 border border-gray-300 rounded-lg" data-mock="true">
+                            <option>Sort by Distance</option>
+                            <option>Sort by Experience</option>
+                            <option>Sort by Rating</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- @MAP: partners.map(partner => ( -->
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Partner Card 1 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        <!-- Boxing training session with focused athlete -->
+                        <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Boxing training session" class="w-full h-48 object-cover">
+                        
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-bold text-fight-dark" data-bind="partner.name">Marcus Rodriguez</h3>
+                                    <p class="text-gray-600" data-bind="partner.age">28 years old</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-fight-gold"></i>
+                                    <span class="ml-1 font-semibold" data-bind="partner.rating">4.8</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-fist-raised text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.disciplines">Boxing, MMA</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-trophy text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.experience">5 years experience</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.distance">2.3 miles away</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-weight text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.weightClass">Welterweight (170 lb)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:sendMessage">
+                                    <i class="fas fa-comment mr-2"></i>Message
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:viewProfile">
+                                    <i class="fas fa-eye text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Partner Card 2 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        <!-- MMA sparring session with two athletes -->
+                        <img src="https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="MMA sparring session" class="w-full h-48 object-cover">
+                        
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-bold text-fight-dark" data-bind="partner.name">Sarah Chen</h3>
+                                    <p class="text-gray-600" data-bind="partner.age">24 years old</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-fight-gold"></i>
+                                    <span class="ml-1 font-semibold" data-bind="partner.rating">4.9</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-fist-raised text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.disciplines">MMA, Kickboxing</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-trophy text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.experience">3 years experience</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.distance">1.8 miles away</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-weight text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.weightClass">Featherweight (145 lb)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:sendMessage">
+                                    <i class="fas fa-comment mr-2"></i>Message
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:viewProfile">
+                                    <i class="fas fa-eye text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Partner Card 3 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        <!-- Boxing training with heavy bag -->
+                        <img src="https://images.unsplash.com/photo-1517438476312-10d79c077509?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Boxing training with heavy bag" class="w-full h-48 object-cover">
+                        
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-bold text-fight-dark" data-bind="partner.name">Jake Thompson</h3>
+                                    <p class="text-gray-600" data-bind="partner.age">31 years old</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-fight-gold"></i>
+                                    <span class="ml-1 font-semibold" data-bind="partner.rating">4.7</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-fist-raised text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.disciplines">Boxing, Muay Thai</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-trophy text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.experience">8 years experience</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.distance">4.1 miles away</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-weight text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.weightClass">Middleweight (185 lb)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:sendMessage">
+                                    <i class="fas fa-comment mr-2"></i>Message
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:viewProfile">
+                                    <i class="fas fa-eye text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Partner Card 4 -->
+                    <div class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                        <!-- Martial arts community training session -->
+                        <img src="https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Martial arts community training session" class="w-full h-48 object-cover">
+                        
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <h3 class="text-xl font-bold text-fight-dark" data-bind="partner.name">Alex Rivera</h3>
+                                    <p class="text-gray-600" data-bind="partner.age">26 years old</p>
+                                </div>
+                                <div class="flex items-center">
+                                    <i class="fas fa-star text-fight-gold"></i>
+                                    <span class="ml-1 font-semibold" data-bind="partner.rating">5.0</span>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-2 mb-4">
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-fist-raised text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.disciplines">MMA, Brazilian Jiu-Jitsu</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-trophy text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.experience">4 years experience</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.distance">3.7 miles away</span>
+                                </div>
+                                <div class="flex items-center text-sm text-gray-600">
+                                    <i class="fas fa-weight text-fight-red w-4"></i>
+                                    <span class="ml-2" data-bind="partner.weightClass">Lightweight (155 lb)</span>
+                                </div>
+                            </div>
+                            
+                            <div class="flex space-x-2">
+                                <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:sendMessage">
+                                    <i class="fas fa-comment mr-2"></i>Message
+                                </button>
+                                <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:viewProfile">
+                                    <i class="fas fa-eye text-gray-600"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_MAP )) -->
+                
+                <!-- Load More Button -->
+                <div class="text-center mt-8">
+                    <button class="bg-fight-red text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:loadMore">
+                        Load More Partners
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- @END_COMPONENT: Browse Partners Section -->
+
+<!-- @COMPONENT: Gym Finder Section -->
+<section id="gyms" class="py-16 bg-white">
+    <div class="container mx-auto px-4">
+        <div class="text-center mb-12">
+            <h2 class="text-4xl font-bold text-fight-dark mb-4">Find Training Gyms</h2>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Discover the best combat sports gyms and training facilities in your area</p>
+        </div>
+        
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- Gym Card 1 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+                <!-- Modern gym equipment for combat sports -->
+                <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Modern gym equipment for combat sports" class="w-full h-48 object-cover">
+                
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-fight-dark" data-bind="gym.name">Elite Fighting Academy</h3>
+                            <p class="text-gray-600" data-bind="gym.location">Downtown District</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-fight-gold"></i>
+                            <span class="ml-1 font-semibold" data-bind="gym.rating">4.9</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-dumbbell text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.specialties">Boxing, MMA, Kickboxing</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.distance">1.2 miles away</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-clock text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.hours">Open 6am - 11pm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:viewGym">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:getDirections">
+                            <i class="fas fa-directions text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gym Card 2 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+                <!-- Professional boxing gym setup -->
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Professional boxing gym setup" class="w-full h-48 object-cover">
+                
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-fight-dark" data-bind="gym.name">Iron Fist Boxing Club</h3>
+                            <p class="text-gray-600" data-bind="gym.location">Westside</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-fight-gold"></i>
+                            <span class="ml-1 font-semibold" data-bind="gym.rating">4.7</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-dumbbell text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.specialties">Boxing, Muay Thai</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.distance">2.8 miles away</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-clock text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.hours">Open 5am - 10pm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:viewGym">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:getDirections">
+                            <i class="fas fa-directions text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gym Card 3 -->
+            <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+                <!-- Mixed martial arts training facility -->
+                <img src="https://images.unsplash.com/photo-1576013551627-0cc20b96c2a7?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&h=250" alt="Mixed martial arts training facility" class="w-full h-48 object-cover">
+                
+                <div class="p-6">
+                    <div class="flex justify-between items-start mb-3">
+                        <div>
+                            <h3 class="text-xl font-bold text-fight-dark" data-bind="gym.name">Warrior MMA Center</h3>
+                            <p class="text-gray-600" data-bind="gym.location">North Side</p>
+                        </div>
+                        <div class="flex items-center">
+                            <i class="fas fa-star text-fight-gold"></i>
+                            <span class="ml-1 font-semibold" data-bind="gym.rating">4.8</span>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 mb-4">
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-dumbbell text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.specialties">MMA, BJJ, Wrestling</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-map-marker-alt text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.distance">3.5 miles away</span>
+                        </div>
+                        <div class="flex items-center text-sm text-gray-600">
+                            <i class="fas fa-clock text-fight-red w-4"></i>
+                            <span class="ml-2" data-bind="gym.hours">Open 6am - 10pm</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex space-x-2">
+                        <button class="flex-1 bg-fight-red text-white py-2 px-4 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-event="click:viewGym">
+                            <i class="fas fa-eye mr-2"></i>View Details
+                        </button>
+                        <button class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors" data-event="click:getDirections">
+                            <i class="fas fa-directions text-gray-600"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- @END_COMPONENT: Gym Finder Section -->
+
+<!-- @COMPONENT: Profile Creation Modal -->
+<div id="profileModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+    <div class="flex items-center justify-center min-h-screen p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-fight-dark">Create Your Fighter Profile</h2>
+                    <button class="text-gray-500 hover:text-gray-700" data-event="click:closeModal">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                
+                <form class="space-y-6" data-event="submit:createProfile">
+                    <!-- Basic Info -->
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">First Name</label>
+                            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="Enter your first name" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Last Name</label>
+                            <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="Enter your last name" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <div class="grid md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Age</label>
+                            <input type="number" min="16" max="65" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="25" data-mock="true">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Weight (lbs)</label>
+                            <input type="number" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="170" data-mock="true">
+                        </div>
+                    </div>
+                    
+                    <!-- Combat Sports -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-3">Combat Sports (Select all that apply)</label>
+                        <div class="grid md:grid-cols-2 gap-3">
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">Boxing</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">MMA</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">Kickboxing</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">Muay Thai</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">Brazilian Jiu-Jitsu</span>
+                            </label>
+                            <label class="flex items-center p-3 border border-gray-300 rounded-lg hover:bg-gray-50 cursor-pointer">
+                                <input type="checkbox" class="w-4 h-4 text-fight-red rounded border-gray-300" data-mock="true">
+                                <span class="ml-3">Wrestling</span>
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Experience Level -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Experience Level</label>
+                        <select class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" data-mock="true">
+                            <option>Select your experience level</option>
+                            <option>Beginner (0-1 years)</option>
+                            <option>Intermediate (2-5 years)</option>
+                            <option>Advanced (5+ years)</option>
+                            <option>Professional</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Training Goals -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Training Goals</label>
+                        <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" rows="3" placeholder="Describe your training goals and what you're looking for in a sparring partner..." data-mock="true"></textarea>
+                    </div>
+                    
+                    <!-- Location -->
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Location</label>
+                        <input type="text" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-fight-red focus:border-transparent" placeholder="City, State" data-mock="true">
+                    </div>
+                    
+                    <!-- Submit Button -->
+                    <div class="flex space-x-4 pt-4">
+                        <button type="button" class="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold hover:bg-gray-50 transition-colors" data-event="click:closeModal">
+                            Cancel
+                        </button>
+                        <button type="submit" class="flex-1 bg-fight-red text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors" data-implementation="Should validate form before submission">
+                            Create Profile
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- @END_COMPONENT: Profile Creation Modal -->
+
+<!-- @COMPONENT: Safety Section -->
+<section id="safety" class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-fight-dark mb-4">Safety Guidelines</h2>
+                <p class="text-xl text-gray-600">Your safety is our top priority. Follow these guidelines for safe and productive training sessions.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-fight-red rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-shield-alt text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-fight-dark mb-3">Pre-Training Safety</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Always meet in public gyms with other people present</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Verify partner credentials and experience level</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Discuss intensity levels and boundaries beforehand</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Inform someone about your training plans</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-fight-red rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-first-aid text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-fight-dark mb-3">Training Safety</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Always use proper protective gear</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Warm up properly before intense sparring</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Respect tap-outs and verbal stops immediately</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Have first aid knowledge and supplies available</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-fight-red rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-users text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-fight-dark mb-3">Community Standards</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Treat all community members with respect</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Report inappropriate behavior immediately</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Be honest about your skill level and experience</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Maintain professional communication</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-xl p-6 shadow-md">
+                    <div class="w-12 h-12 bg-fight-red rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas fa-exclamation-triangle text-white text-xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-fight-dark mb-3">Report Issues</h3>
+                    <ul class="space-y-2 text-gray-600">
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Use in-app reporting for safety concerns</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Contact support for technical issues</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Emergency: Call 911 for medical emergencies</span>
+                        </li>
+                        <li class="flex items-start">
+                            <i class="fas fa-check text-green-500 mt-1 mr-2 text-sm"></i>
+                            <span>Block and report inappropriate users</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <button class="bg-fight-red text-white px-8 py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors">
+                    <i class="fas fa-flag mr-2"></i>Report Safety Issue
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- @END_COMPONENT: Safety Section -->
+
+<!-- @COMPONENT: Footer -->
+<footer class="bg-fight-dark text-white py-12">
+    <div class="container mx-auto px-4">
+        <div class="grid md:grid-cols-4 gap-8">
+            <div>
+                <div class="flex items-center space-x-2 mb-4">
+                    <div class="w-8 h-8 bg-fight-red rounded-lg flex items-center justify-center">
+                        <i class="fas fa-fist-raised text-white"></i>
+                    </div>
+                    <span class="text-xl font-bold">FightFinder</span>
+                </div>
+                <p class="text-gray-400">Connecting combat sports athletes worldwide for safe and productive training partnerships.</p>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Platform</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Find Partners</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Browse Gyms</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Create Profile</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Safety Guidelines</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Support</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Help Center</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Contact Us</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Community Guidelines</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Report Issue</a></li>
+                </ul>
+            </div>
+            
+            <div>
+                <h4 class="text-lg font-semibold mb-4">Legal</h4>
+                <ul class="space-y-2 text-gray-400">
+                    <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Cookie Policy</a></li>
+                    <li><a href="#" class="hover:text-white transition-colors">Disclaimer</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+            <p>&copy; 2024 FightFinder. All rights reserved. Train safe, fight smart.</p>
+        </div>
+    </div>
+</footer>
+<!-- @END_COMPONENT: Footer -->
+
+<script>
+(function() {
+    // TODO: Implement business logic, API calls, and state management
+    
+    // Modal functionality
+    function initializeModals() {
+        const modalTriggers = document.querySelectorAll('[data-event*="click:"]');
+        const modal = document.getElementById('profileModal');
+        
+        modalTriggers.forEach(trigger => {
+            trigger.addEventListener('click', function(e) {
+                e.preventDefault();
+                const action = this.getAttribute('data-event').split(':')[1];
+                
+                switch(action) {
+                    case 'openProfileModal':
+                        modal.classList.remove('hidden');
+                        break;
+                    case 'closeModal':
+                        modal.classList.add('hidden');
+                        break;
+                }
+            });
+        });
+        
+        // Close modal when clicking outside
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) {
+                modal.classList.add('hidden');
+            }
+        });
+    }
+    
+    // Smooth scrolling for navigation links
+    function initializeNavigation() {
+        const navLinks = document.querySelectorAll('a[href^="#"]');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+                
+                if (targetElement) {
+                    targetElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    }
+    
+    // Initialize components
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeModals();
+        initializeNavigation();
+    });
+    
+    // Add "Create Profile" trigger to hero button
+    const heroCreateButton = document.querySelector('.bg-white.hover\\:bg-white.hover\\:text-fight-dark');
+    if (heroCreateButton) {
+        heroCreateButton.setAttribute('data-event', 'click:openProfileModal');
+    }
+})();
+</script>
+
+</body>
+</html>

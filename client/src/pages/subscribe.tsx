@@ -1,289 +1,391 @@
-import { useStripe, Elements, PaymentElement, useElements } from '@stripe/react-stripe-js';
-import { loadStripe } from '@stripe/stripe-js';
-import { useEffect, useState } from 'react';
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
-import { isUnauthorizedError } from "@/lib/authUtils";
 import { Navigation } from "@/components/ui/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-// Make sure to call `loadStripe` outside of a component's render to avoid
-// recreating the `Stripe` object on every render.
-if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
-  throw new Error('Missing required Stripe key: VITE_STRIPE_PUBLIC_KEY');
+import { CheckCircle, CreditCard, Smartphone, Globe, IndianRupee, DollarSign } from "lucide-react";
+
+interface PricingPlan {
+  name: string;
+  features: string[];
+  popular?: boolean;
 }
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const SubscribeForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const { toast } = useToast();
-  
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+interface PaymentMethods {
+  methods: string[];
+  cards?: string[];
+  upi?: string[];
+  description: string;
+}
 
-    if (!stripe || !elements) {
-      return;
+interface PricingData {
+  [key: string]: {
+    usd: { amount: number; display: string };
+    inr: { amount: number; display: string };
+  };
+}
+
+const pricingPlans: Record<string, PricingPlan> = {
+  basic: {
+    name: "Basic",
+    features: [
+      "Access to basic fight finder",
+      "View gym locations",
+      "Basic messaging",
+      "Profile creation"
+    ]
+  },
+  premium: {
+    name: "Premium",
+    features: [
+      "Everything in Basic",
+      "Advanced fight matching",
+      "Priority messaging",
+      "Detailed analytics",
+      "Custom training plans"
+    ],
+    popular: true
+  },
+  pro: {
+    name: "Pro",
+    features: [
+      "Everything in Premium",
+      "Professional coaching access",
+      "Tournament notifications",
+      "Advanced statistics",
+      "Priority support",
+      "Custom branding"
+    ]
+  }
+};
+
+const PaymentMethodCard = ({ method, currency, onSelect, selected }: {
+  method: string;
+  currency: string;
+  onSelect: (method: string) => void;
+  selected: boolean;
+}) => {
+  const getMethodIcon = (method: string) => {
+    switch (method) {
+      case 'card':
+        return <CreditCard className="h-6 w-6" />;
+      case 'upi':
+        return <Smartphone className="h-6 w-6" />;
+      default:
+        return <Globe className="h-6 w-6" />;
     }
+  };
 
-    const { error } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: window.location.origin,
-      },
-    });
-
-    if (error) {
-      toast({
-        title: "Payment Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Payment Successful",
-        description: "You are subscribed!",
-      });
+  const getMethodName = (method: string) => {
+    switch (method) {
+      case 'card':
+        return currency === 'inr' ? 'Cards (Visa, Mastercard, RuPay)' : 'Cards (Visa, Mastercard, Amex)';
+      case 'upi':
+        return 'UPI (PhonePe, Google Pay, Paytm, BHIM)';
+      default:
+        return method;
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <PaymentElement />
-      <Button 
-        type="submit" 
-        disabled={!stripe}
-        className="w-full bg-fight-red hover:bg-fight-red-dark"
-      >
-        Subscribe to Pro
-      </Button>
-    </form>
+    <Card 
+      className={`cursor-pointer transition-all hover:shadow-md ${
+        selected ? 'ring-2 ring-fight-red border-fight-red' : ''
+      }`}
+      onClick={() => onSelect(method)}
+    >
+      <CardContent className="flex items-center space-x-3 p-4">
+        {getMethodIcon(method)}
+        <div className="flex-1">
+          <h4 className="font-medium">{getMethodName(method)}</h4>
+          {method === 'upi' && (
+            <p className="text-sm text-muted-foreground">
+              Pay with UPI ID or scan QR code
+            </p>
+          )}
+        </div>
+        {selected && <CheckCircle className="h-5 w-5 text-fight-red" />}
+      </CardContent>
+    </Card>
   );
 };
 
 export default function Subscribe() {
+  const { user } = useAuth();
   const { toast } = useToast();
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const [clientSecret, setClientSecret] = useState("");
-  const [selectedPlan, setSelectedPlan] = useState("pro");
+  const [selectedCurrency, setSelectedCurrency] = useState<'usd' | 'inr'>('usd');
+  const [selectedPlan, setSelectedPlan] = useState<string>('premium');
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('card');
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethods | null>(null);
+  const [pricing, setPricing] = useState<PricingData | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  // Redirect to login if not authenticated
+  // Fetch payment methods and pricing
   useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
+    const fetchPaymentData = async () => {
+      try {
+        const response = await apiRequest(`/api/payment/methods?currency=${selectedCurrency}`);
+        if (response.ok) {
+          const data = await response.json();
+          setPaymentMethods(data.paymentMethods);
+          setPricing(data.pricing);
+        }
+      } catch (error) {
+        console.error('Failed to fetch payment data:', error);
+      }
+    };
+
+    fetchPaymentData();
+  }, [selectedCurrency]);
+
+  const handlePayment = async () => {
+    if (!user) {
       toast({
-        title: "Unauthorized",
-        description: "You are logged out. Logging in again...",
+        title: "Authentication Required",
+        description: "Please log in to continue.",
         variant: "destructive",
       });
-      setTimeout(() => {
-        window.location.href = "/api/login";
-      }, 500);
       return;
     }
-  }, [isAuthenticated, isLoading, toast]);
 
-  useEffect(() => {
-    if (user && selectedPlan === "pro") {
-      // Create subscription as soon as the page loads
-      apiRequest("POST", "/api/get-or-create-subscription")
-        .then((res) => res.json())
-        .then((data) => {
-          setClientSecret(data.clientSecret);
+    setLoading(true);
+    try {
+      const response = await apiRequest('/api/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          currency: selectedCurrency,
+          paymentMethod: selectedPaymentMethod,
+          planType: selectedPlan
         })
-        .catch((error) => {
-          if (isUnauthorizedError(error)) {
-            toast({
-              title: "Unauthorized",
-              description: "You are logged out. Logging in again...",
-              variant: "destructive",
-            });
-            setTimeout(() => {
-              window.location.href = "/api/login";
-            }, 500);
-            return;
-          }
-          toast({
-            title: "Error",
-            description: "Failed to initialize payment. Please try again.",
-            variant: "destructive",
-          });
-        });
-    }
-  }, [user, selectedPlan, toast]);
+      });
 
-  const handleLogout = () => {
-    window.location.href = "/api/logout";
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const data = await response.json();
+      
+      // Redirect to Stripe Checkout
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (error) {
+      console.error('Payment error:', error);
+      toast({
+        title: "Payment Failed",
+        description: "Unable to process payment. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
-  if (isLoading || !isAuthenticated) {
+  if (!user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" />
-      </div>
-    );
-  }
-
-  if (selectedPlan === "pro" && !clientSecret) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation user={user} onLogout={handleLogout} />
-        <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      <div className="min-h-screen bg-gradient-to-br from-fight-black via-fight-gray to-fight-black">
+        <Navigation />
+        <div className="container mx-auto px-4 py-16">
           <div className="text-center">
-            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full mx-auto" />
-            <p className="mt-4 text-gray-600">Setting up your subscription...</p>
+            <h1 className="text-4xl font-bold text-white mb-4">
+              Please log in to subscribe
+            </h1>
+            <p className="text-gray-300 mb-8">
+              You need to be logged in to access subscription plans.
+            </p>
           </div>
         </div>
       </div>
     );
   }
 
+  const handleLogout = () => {
+    // Clear all authentication data
+    localStorage.removeItem('user');
+    localStorage.removeItem('isAuthenticated');
+    
+    // Trigger storage event for other components to update
+    window.dispatchEvent(new StorageEvent('storage', {
+      key: 'isAuthenticated',
+      oldValue: 'true',
+      newValue: null,
+      storageArea: localStorage
+    }));
+    
+    // Simple redirect without reload to avoid routing conflicts
+    window.location.href = '/';
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation user={user} onLogout={handleLogout} />
-      
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <div className="min-h-screen bg-gradient-to-br from-fight-black via-fight-gray to-fight-black">
+      <Navigation 
+        user={user}
+        onLogin={() => window.location.href = '/auth'}
+        onLogout={handleLogout}
+      />
+      <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-fight-black">Choose Your Plan</h1>
-          <p className="mt-4 text-xl text-gray-600">Unlock premium features for serious fighters</p>
+          <h1 className="text-4xl font-bold text-white mb-4">
+            Choose Your Plan
+          </h1>
+          <p className="text-gray-300 text-lg">
+            Unlock the full potential of FightFind with multi-currency payments
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
-          {/* Basic Plan */}
-          <Card className="relative">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold text-fight-black mb-4">Basic</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-fight-black">Free</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Basic profile creation</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Limited partner search</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">3 connections per week</span>
-                </li>
-              </ul>
-              <Button 
-                variant="outline" 
-                className="w-full border-2 border-fight-red text-fight-red hover:bg-fight-red hover:text-white"
-                onClick={() => setSelectedPlan("basic")}
-              >
-                Current Plan
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Pro Plan */}
-          <Card className="relative transform scale-105 bg-fight-red">
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-              <Badge className="bg-white text-fight-red">Most Popular</Badge>
-            </div>
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold text-white mb-4">Pro</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-white">$19</span>
-                <span className="text-white/80">/month</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="text-white mr-3" size={20} />
-                  <span className="text-white">Unlimited connections</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-white mr-3" size={20} />
-                  <span className="text-white">Advanced filtering</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-white mr-3" size={20} />
-                  <span className="text-white">Priority matching</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-white mr-3" size={20} />
-                  <span className="text-white">Direct messaging</span>
-                </li>
-              </ul>
-              <Button 
-                className="w-full bg-white text-fight-red hover:bg-gray-100"
-                onClick={() => setSelectedPlan("pro")}
-              >
-                {selectedPlan === "pro" ? "Selected" : "Choose Pro"}
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Elite Plan */}
-          <Card className="relative">
-            <CardContent className="p-8">
-              <h3 className="text-2xl font-bold text-fight-black mb-4">Elite</h3>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-fight-black">$39</span>
-                <span className="text-gray-600">/month</span>
-              </div>
-              <ul className="space-y-4 mb-8">
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Everything in Pro</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Video call integration</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Training analytics</span>
-                </li>
-                <li className="flex items-center">
-                  <CheckCircle className="text-green-500 mr-3" size={20} />
-                  <span className="text-gray-700">Professional coaching</span>
-                </li>
-              </ul>
-              <Button 
-                variant="outline" 
-                className="w-full border-2 border-fight-red text-fight-red hover:bg-fight-red hover:text-white"
-                onClick={() => setSelectedPlan("elite")}
-              >
-                Coming Soon
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Payment Form */}
-        {selectedPlan === "pro" && clientSecret && (
-          <Card className="max-w-2xl mx-auto">
+        {/* Currency Selection */}
+        <div className="max-w-md mx-auto mb-8">
+          <Card className="bg-fight-gray border-gray-700">
             <CardHeader>
-              <CardTitle className="text-center">Complete Your Pro Subscription</CardTitle>
+              <CardTitle className="text-white text-center flex items-center justify-center gap-2">
+                <Globe className="h-5 w-5" />
+                Select Currency
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="bg-gray-50 rounded-lg p-4 mb-6">
-                <div className="flex justify-between items-center">
-                  <span className="font-semibold">Pro Monthly Subscription</span>
-                  <span className="text-xl font-bold">$19.00</span>
-                </div>
-                <p className="text-sm text-gray-600 mt-1">Billed monthly • Cancel anytime</p>
-              </div>
-
-              <Elements stripe={stripePromise} options={{ clientSecret }}>
-                <SubscribeForm />
-              </Elements>
-
-              <p className="text-xs text-gray-500 text-center mt-4">
-                By proceeding, you agree to our Terms of Service and Privacy Policy.
-                Your subscription will automatically renew each month.
-              </p>
+              <Tabs value={selectedCurrency} onValueChange={(value: string) => setSelectedCurrency(value as 'usd' | 'inr')}>
+                <TabsList className="grid w-full grid-cols-2 bg-fight-black">
+                  <TabsTrigger value="usd" className="flex items-center gap-2">
+                    <DollarSign className="h-4 w-4" />
+                    USD
+                  </TabsTrigger>
+                  <TabsTrigger value="inr" className="flex items-center gap-2">
+                    <IndianRupee className="h-4 w-4" />
+                    INR
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             </CardContent>
           </Card>
-        )}
+        </div>
+
+        {/* Pricing Plans */}
+        <div className="grid md:grid-cols-3 gap-8 mb-12">
+          {Object.entries(pricingPlans).map(([planKey, plan]) => {
+            const planPricing = pricing?.[planKey];
+            const currentPrice = planPricing?.[selectedCurrency];
+            const isSelected = selectedPlan === planKey;
+            
+            return (
+              <Card 
+                key={planKey}
+                className={`cursor-pointer transition-all hover:shadow-lg ${
+                  isSelected 
+                    ? 'bg-fight-gray border-fight-red ring-2 ring-fight-red' 
+                    : plan.popular 
+                    ? 'bg-fight-gray border-fight-red' 
+                    : 'bg-fight-gray border-gray-700'
+                }`}
+                onClick={() => setSelectedPlan(planKey)}
+              >
+                {plan.popular && (
+                  <Badge className="absolute -top-2 left-1/2 transform -translate-x-1/2 bg-fight-red">
+                    Most Popular
+                  </Badge>
+                )}
+                <CardHeader>
+                  <CardTitle className="text-white text-xl flex items-center justify-between">
+                    {plan.name}
+                    {isSelected && <CheckCircle className="h-5 w-5 text-fight-red" />}
+                  </CardTitle>
+                  <div className="text-3xl font-bold text-white">
+                    {currentPrice?.display || '$0'}
+                    <span className="text-lg font-normal text-gray-400">/month</span>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-3 text-gray-300">
+                    {plan.features.map((feature, index) => (
+                      <li key={index} className="flex items-center">
+                        <CheckCircle className="h-5 w-5 text-fight-red mr-2 flex-shrink-0" />
+                        {feature}
+                      </li>
+                    ))}
+                  </ul>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+
+        {/* Payment Methods */}
+        <div className="max-w-2xl mx-auto mb-8">
+          <Card className="bg-fight-gray border-gray-700">
+            <CardHeader>
+              <CardTitle className="text-white text-center">
+                Payment Methods
+              </CardTitle>
+              <CardDescription className="text-center text-gray-300">
+                {paymentMethods?.description || 'Select your preferred payment method'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4">
+                {paymentMethods?.methods.map((method: string) => (
+                  <PaymentMethodCard
+                    key={method}
+                    method={method}
+                    currency={selectedCurrency}
+                    selected={selectedPaymentMethod === method}
+                    onSelect={setSelectedPaymentMethod}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Payment Button */}
+        <div className="max-w-md mx-auto">
+          <Card className="bg-fight-gray border-gray-700">
+            <CardContent className="p-6">
+              <div className="text-center mb-4">
+                <h3 className="text-white text-lg font-semibold mb-2">
+                  {pricingPlans[selectedPlan]?.name} Plan
+                </h3>
+                <p className="text-gray-300 text-sm mb-4">
+                  Pay with {selectedPaymentMethod === 'upi' ? 'UPI' : 'Card'} in {selectedCurrency.toUpperCase()}
+                </p>
+                <div className="text-2xl font-bold text-white">
+                  {pricing?.[selectedPlan]?.[selectedCurrency]?.display || '$0'}/month
+                </div>
+              </div>
+              
+              <Button 
+                onClick={handlePayment}
+                disabled={loading}
+                className="w-full bg-fight-red hover:bg-fight-red-dark text-white font-semibold py-3"
+              >
+                {loading ? (
+                  <div className="flex items-center gap-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Processing...
+                  </div>
+                ) : (
+                  `Subscribe with ${selectedPaymentMethod === 'upi' ? 'UPI' : 'Card'}`
+                )}
+              </Button>
+              
+              {selectedCurrency === 'inr' && selectedPaymentMethod === 'upi' && (
+                <p className="text-xs text-gray-400 text-center mt-3">
+                  Supports PhonePe, Google Pay, Paytm, BHIM, and UPI ID
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </div>
   );

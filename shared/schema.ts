@@ -35,6 +35,9 @@ export const users = pgTable("users", {
   stripeSubscriptionId: varchar("stripe_subscription_id"),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
+  provider: varchar("provider"),
+  googleId: varchar("google_id"),
+  emailVerified: boolean("email_verified"),
 });
 
 // Fighter profiles

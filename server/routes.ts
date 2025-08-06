@@ -1,104 +1,342 @@
-import type { Express } from "express";
-import { createServer, type Server } from "http";
+import { Express, Request, Response } from "express";
+import { Session } from "express-session";
 import Stripe from "stripe";
-import { storage } from "./storage";
-import { setupAuth, isAuthenticated } from "./replitAuth";
-import { insertFighterProfileSchema, insertConnectionSchema, insertMessageSchema } from "@shared/schema";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import { storage } from './storage';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('Missing required Stripe secret: STRIPE_SECRET_KEY');
+dotenv.config();
+
+// Initialize Stripe only if API key is provided
+let stripe: Stripe | null = null;
+if (process.env.STRIPE_SECRET_KEY && process.env.STRIPE_SECRET_KEY !== 'sk_test_your_stripe_secret_key_here') {
+  console.log('STRIPE KEY: Configured');
+  stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2025-07-30.basil',
+  });
+} else {
+  console.log('STRIPE KEY: Not configured - Stripe features will be disabled');
 }
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-07-30.basil",
-});
+export async function registerRoutes(app: Express) {
+  // Add middleware
+  app.use(cookieParser());
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // Auth middleware
-  await setupAuth(app);
-
-  // Auth routes
-  app.get('/api/auth/user', isAuthenticated, async (req: any, res) => {
+  // Test endpoint to verify backend is working
+  app.get('/api/test', (req: Request, res: Response) => {
+    console.log('✅ Test endpoint hit');
+    res.json({ status: 'ok', message: 'Backend is working' });
+  });
+  
+  // Authentication endpoints
+  app.post("/api/auth/register", async (req: Request, res: Response) => {
     try {
-      const userId = req.user.claims.sub;
-      const user = await storage.getUser(userId);
-      res.json(user);
+      const { firstName, lastName, email, password } = req.body;
+      
+      // Validate required fields
+      if (!firstName || !lastName || !email || !password) {
+        return res.status(400).json({ 
+          error: "All fields are required",
+          details: "Please provide firstName, lastName, email, and password" 
+        });
+      }
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByEmail(email);
+      if (existingUser) {
+        return res.status(409).json({ 
+          error: "User already exists",
+          details: "An account with this email address already exists" 
+        });
+      }
+      
+      // Create new user in PostgreSQL
+      const user = await storage.createUser({
+        firstName,
+        lastName,
+        email,
+        provider: 'local',
+        emailVerified: true, // For now, we'll auto-verify local accounts
+        profileImageUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(firstName)}+${encodeURIComponent(lastName)}&background=random`
+      });
+
+      // Create session
+      req.logIn(user, (err) => {
+        if (err) {
+          console.error('❌ [Auth Error] Session login failed:', err);
+          return res.status(500).json({ 
+            error: "Registration successful but session creation failed",
+            details: "Please try logging in"
+          });
+        }
+
+        // Return success response
+        res.status(201).json({ 
+          message: "Registration successful",
+          user
+        });
+      });
     } catch (error) {
-      console.error("Error fetching user:", error);
-      res.status(500).json({ message: "Failed to fetch user" });
+      console.error('❌ [Auth] Registration error:', error);
+      res.status(500).json({ 
+        error: "Registration failed",
+        details: "An internal server error occurred" 
+      });
     }
   });
 
-  // Fighter profile routes
-  app.get('/api/profile', isAuthenticated, async (req: any, res) => {
+  app.post("/api/auth/login", async (_req: Request, res: Response) => {
+    // We only support Google OAuth now
+    res.status(400).json({ 
+      error: "Direct login is not supported. Please use Google Sign-In.",
+      details: "This application only supports Google authentication."
+    });
+  });
+
+  app.post("/api/auth/logout", async (req: Request, res: Response) => {
+    if (req.session) {
+      req.session.destroy(() => {});
+    }
+    req.logout(() => {
+      res.json({ success: true, message: 'Logged out successfully' });
+    });
+  });
+
+  // OAuth user endpoint to get the currently logged-in user's info
+  app.get("/api/auth/oauth/user", async (req: Request, res: Response) => {
     try {
-      const userId = req.user.claims.sub;
-      const profile = await storage.getFighterProfile(userId);
-      res.json(profile);
+      console.log('🔍 [OAuth Debug] User info request:', {
+        isAuthenticated: req.isAuthenticated?.(),
+        hasSession: !!req.session,
+        user: req.user
+      });
+
+      if (!req.isAuthenticated?.()) {
+        console.log('❌ [OAuth Debug] User not authenticated');
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const user = req.user as any;
+      if (!user) {
+        console.log('❌ [OAuth Debug] No user object in session');
+        return res.status(401).json({ error: "No user found in session" });
+      }
+
+      // Return user data
+      res.json({
+        id: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        provider: user.provider,
+        emailVerified: user.emailVerified
+      });
     } catch (error) {
-      console.error("Error fetching profile:", error);
-      res.status(500).json({ message: "Failed to fetch profile" });
+      console.error('❌ [OAuth Debug] Error fetching user info:', error);
+      res.status(500).json({ error: "Failed to get user information" });
     }
   });
 
-  app.post('/api/profile', isAuthenticated, async (req: any, res) => {
+  // Profile routes
+  app.get("/api/profile", async (req: Request, res: Response) => {
     try {
-      const userId = req.user.claims.sub;
-      const profileData = insertFighterProfileSchema.parse({
-        ...req.body,
-        userId,
+      console.log('🔍 [Profile Debug] Request:', {
+        headers: {
+          cookie: req.headers.cookie,
+          authorization: req.headers.authorization
+        },
+        session: {
+          hasSession: !!req.session,
+          isAuthenticated: req.isAuthenticated?.(),
+          user: req.user,
+          sessionID: req.sessionID
+        }
+      });
+
+      if (!req.session || !req.isAuthenticated()) {
+        console.log('❌ [Profile Debug] Not authenticated:', {
+          session: req.session,
+          isAuthenticated: req.isAuthenticated?.(),
+          sessionID: req.sessionID,
+          user: req.user,
+          cookies: req.cookies
+        });
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const userId = (req.user as any).id;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID not found" });
+      }
+
+      // Get user profile from database
+      const user = await storage.getUserById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // Get fighter profile if it exists
+      const fighterProfile = await storage.getFighterProfile(userId);
+
+      // Return combined user and fighter profile data
+      res.json({
+        user,
+        fighterProfile
+      });
+    } catch (error) {
+      console.error('❌ [Profile] Get error:', error);
+      res.status(500).json({ error: "Failed to get profile" });
+    }
+  });
+
+  app.post("/api/profile", async (req: Request, res: Response) => {
+    try {
+      console.log('🔍 [Profile Update] Auth check:', {
+        session: req.session,
+        isAuthenticated: req.isAuthenticated?.(),
+        user: req.user,
+        cookies: req.cookies,
+        headers: {
+          cookie: req.headers.cookie,
+          authorization: req.headers.authorization
+        }
+      });
+
+      if (!req.isAuthenticated?.()) {
+        console.log('❌ [Profile Update] Not authenticated');
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const userId = (req.user as any).id;
+      if (!userId) {
+        return res.status(400).json({ error: "User ID not found" });
+      }
+
+      const { 
+        discipline, 
+        experienceLevel, 
+        weightClass, 
+        weight, 
+        location, 
+        bio, 
+        availability,
+        latitude,
+        longitude
+      } = req.body;
+
+      // Check if fighter profile exists
+      let fighterProfile = await storage.getFighterProfile(userId);
+
+      if (fighterProfile) {
+        // Update existing profile
+        fighterProfile = await storage.updateFighterProfile(userId, {
+          discipline,
+          experienceLevel,
+          weightClass,
+          weight,
+          location,
+          bio,
+          availability,
+          latitude,
+          longitude
+        });
+      } else {
+        // Create new profile
+        fighterProfile = await storage.createFighterProfile({
+          userId,
+          discipline,
+          experienceLevel,
+          weightClass,
+          weight,
+          location,
+          bio,
+          availability,
+          latitude,
+          longitude,
+          isActive: true,
+          verified: false
+        });
+      }
+
+      res.json({
+        message: "Profile updated successfully",
+        fighterProfile
+      });
+    } catch (error) {
+      console.error('❌ [Profile] Update error:', error);
+      res.status(500).json({ error: "Failed to update profile" });
+    }
+  });
+
+  // Partner routes
+  app.get("/api/partners", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      // Get all fighter profiles
+      const fighterProfiles = await storage.searchFighterProfiles({});
+
+      res.json(fighterProfiles);
+    } catch (error) {
+      console.error('❌ [Partners] List error:', error);
+      res.status(500).json({ error: 'Failed to get partners' });
+    }
+  });
+
+  // Connections routes
+  app.get("/api/connections", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const userId = (req.user as any).id;
+      const connections = await storage.getConnectionsByUser(userId);
+      
+      res.json(connections);
+    } catch (error) {
+      console.error('❌ [Connections] List error:', error);
+      res.status(500).json({ error: 'Failed to get connections' });
+    }
+  });
+
+  app.post("/api/connections", async (req: Request, res: Response) => {
+    try {
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
+
+      const userId = (req.user as any).id;
+      const { receiverId, message } = req.body;
+
+      // Create new connection
+      const connection = await storage.createConnection({
+        requesterId: userId,
+        receiverId,
+        message,
+        status: 'pending'
       });
       
-      const existingProfile = await storage.getFighterProfile(userId);
-      let profile;
-      
-      if (existingProfile) {
-        profile = await storage.updateFighterProfile(userId, profileData);
-      } else {
-        profile = await storage.createFighterProfile(profileData);
-      }
-      
-      res.json(profile);
+      res.json(connection);
     } catch (error) {
-      console.error("Error creating/updating profile:", error);
-      res.status(400).json({ message: "Failed to save profile" });
-    }
-  });
-
-  // Partner search routes
-  app.get('/api/partners', async (req, res) => {
-    try {
-      const { discipline, experienceLevel, location, latitude, longitude, radius } = req.query;
-      
-      const filters: any = {};
-      if (discipline) filters.discipline = discipline as string;
-      if (experienceLevel) filters.experienceLevel = experienceLevel as string;
-      if (location) filters.location = location as string;
-      if (latitude && longitude) {
-        filters.latitude = parseFloat(latitude as string);
-        filters.longitude = parseFloat(longitude as string);
-        filters.radius = radius ? parseFloat(radius as string) : 25; // default 25 miles
-      }
-
-      const profiles = await storage.searchFighterProfiles(filters);
-      res.json(profiles);
-    } catch (error) {
-      console.error("Error searching partners:", error);
-      res.status(500).json({ message: "Failed to search partners" });
+      console.error('❌ [Connections] Create error:', error);
+      res.status(500).json({ error: 'Failed to create connection' });
     }
   });
 
   // Gym routes
-  app.get('/api/gyms', async (req, res) => {
+  app.get("/api/gyms", async (req: Request, res: Response) => {
     try {
       const { latitude, longitude, radius } = req.query;
       
       let gyms;
-      if (latitude && longitude) {
+      if (latitude && longitude && radius) {
         gyms = await storage.getGymsByLocation(
-          parseFloat(latitude as string),
-          parseFloat(longitude as string),
-          radius ? parseFloat(radius as string) : 25
+          parseFloat(latitude as string), 
+          parseFloat(longitude as string), 
+          parseFloat(radius as string)
         );
       } else {
         gyms = await storage.getAllGyms();
@@ -106,140 +344,63 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       res.json(gyms);
     } catch (error) {
-      console.error("Error fetching gyms:", error);
-      res.status(500).json({ message: "Failed to fetch gyms" });
+      console.error('❌ [Gyms] List error:', error);
+      res.status(500).json({ error: 'Failed to get gyms' });
     }
   });
 
-  // Connection routes
-  app.post('/api/connections', isAuthenticated, async (req: any, res) => {
+  app.post("/api/gyms", async (req: Request, res: Response) => {
     try {
-      const requesterId = req.user.claims.sub;
-      const connectionData = insertConnectionSchema.parse({
-        ...req.body,
-        requesterId,
-      });
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
 
-      const connection = await storage.createConnection(connectionData);
-      res.json(connection);
+      const gym = await storage.createGym(req.body);
+      res.json(gym);
     } catch (error) {
-      console.error("Error creating connection:", error);
-      res.status(400).json({ message: "Failed to create connection" });
+      console.error('❌ [Gyms] Create error:', error);
+      res.status(500).json({ error: 'Failed to create gym' });
     }
   });
 
-  app.get('/api/connections', isAuthenticated, async (req: any, res) => {
+  // Messages routes
+  app.get("/api/messages/:connectionId", async (req: Request, res: Response) => {
     try {
-      const userId = req.user.claims.sub;
-      const connections = await storage.getConnectionsByUser(userId);
-      res.json(connections);
-    } catch (error) {
-      console.error("Error fetching connections:", error);
-      res.status(500).json({ message: "Failed to fetch connections" });
-    }
-  });
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
 
-  app.patch('/api/connections/:id', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const { status } = req.body;
+      const { connectionId } = req.params;
+      const messages = await storage.getMessagesByConnection(connectionId);
       
-      const connection = await storage.updateConnectionStatus(id, status);
-      res.json(connection);
-    } catch (error) {
-      console.error("Error updating connection:", error);
-      res.status(400).json({ message: "Failed to update connection" });
-    }
-  });
-
-  // Message routes
-  app.get('/api/connections/:id/messages', isAuthenticated, async (req: any, res) => {
-    try {
-      const { id } = req.params;
-      const messages = await storage.getMessagesByConnection(id);
       res.json(messages);
     } catch (error) {
-      console.error("Error fetching messages:", error);
-      res.status(500).json({ message: "Failed to fetch messages" });
+      console.error('❌ [Messages] List error:', error);
+      res.status(500).json({ error: 'Failed to get messages' });
     }
   });
 
-  app.post('/api/connections/:id/messages', isAuthenticated, async (req: any, res) => {
+  app.post("/api/messages", async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const senderId = req.user.claims.sub;
-      
-      const messageData = insertMessageSchema.parse({
-        ...req.body,
-        connectionId: id,
-        senderId,
-      });
+      if (!req.isAuthenticated?.()) {
+        return res.status(401).json({ error: "Not authenticated" });
+      }
 
-      const message = await storage.createMessage(messageData);
+      const userId = (req.user as any).id;
+      const { connectionId, content } = req.body;
+
+      const message = await storage.createMessage({
+        connectionId,
+        senderId: userId,
+        content,
+      });
+      
       res.json(message);
     } catch (error) {
-      console.error("Error creating message:", error);
-      res.status(400).json({ message: "Failed to send message" });
+      console.error('❌ [Messages] Create error:', error);
+      res.status(500).json({ error: 'Failed to create message' });
     }
   });
 
-  // Stripe subscription route
-  app.post('/api/get-or-create-subscription', isAuthenticated, async (req: any, res) => {
-    try {
-      let user = req.user;
-      const userId = user.claims.sub;
-      const userData = await storage.getUser(userId);
-
-      if (userData?.stripeSubscriptionId) {
-        const subscription = await stripe.subscriptions.retrieve(userData.stripeSubscriptionId);
-        
-        const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
-        const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent;
-        
-        res.json({
-          subscriptionId: subscription.id,
-          clientSecret: paymentIntent?.client_secret,
-        });
-        return;
-      }
-
-      if (!userData?.email) {
-        throw new Error('No user email on file');
-      }
-
-      const customer = await stripe.customers.create({
-        email: userData.email,
-        name: `${userData.firstName || ''} ${userData.lastName || ''}`.trim(),
-      });
-
-      if (!process.env.STRIPE_PRICE_ID) {
-        throw new Error('STRIPE_PRICE_ID environment variable is required');
-      }
-
-      const subscription = await stripe.subscriptions.create({
-        customer: customer.id,
-        items: [{
-          price: process.env.STRIPE_PRICE_ID,
-        }],
-        payment_behavior: 'default_incomplete',
-        expand: ['latest_invoice.payment_intent'],
-      });
-
-      await storage.updateUserStripeInfo(userId, customer.id, subscription.id);
-
-      const latestInvoice = subscription.latest_invoice as Stripe.Invoice;
-      const paymentIntent = latestInvoice?.payment_intent as Stripe.PaymentIntent;
-      
-      res.json({
-        subscriptionId: subscription.id,
-        clientSecret: paymentIntent?.client_secret,
-      });
-    } catch (error: any) {
-      console.error("Subscription error:", error);
-      res.status(400).json({ error: { message: error.message } });
-    }
-  });
-
-  const httpServer = createServer(app);
-  return httpServer;
+  return app;
 }
